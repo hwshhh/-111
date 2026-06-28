@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>简易代办清单</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+        }
+        body {
+            max-width: 500px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .timer-box {
+            text-align: center;
+            font-size: 32px;
+            margin: 15px 0;
+        }
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+        button {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #start { background: #42b983; color: white; }
+        #pause { background: #ff9500; color: white; }
+        #reset { background: #f44336; color: white; }
+        .add-box {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        #taskInput {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        ul {
+            list-style: none;
+        }
+        li {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+        .del {
+            background: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h2>代办清单</h2>
+
+    <!-- 计时器区域 -->
+    <div class="timer-box" id="timer">00:00:00</div>
+    <div class="btn-group">
+        <button id="start">开始</button>
+        <button id="pause">暂停</button>
+        <button id="reset">重置</button>
+    </div>
+
+    <!-- 添加代办 -->
+    <div class="add-box">
+        <input type="text" id="taskInput" placeholder="输入代办事项">
+        <button onclick="addTask()">添加</button>
+    </div>
+
+    <!-- 代办列表 -->
+    <ul id="taskList"></ul>
+
+    <script>
+        // 计时器逻辑
+        let timer = null;
+        let sec = 0;
+        const timerDom = document.getElementById('timer');
+
+        // 格式化时间 时:分:秒
+        function formatTime(s) {
+            let h = Math.floor(s / 3600);
+            let m = Math.floor((s % 3600) / 60);
+            let ss = s % 60;
+            return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;
+        }
+
+        // 开始计时
+        document.getElementById('start').onclick = () => {
+            if (!timer) {
+                timer = setInterval(() => {
+                    sec++;
+                    timerDom.innerText = formatTime(sec);
+                }, 1000);
+            }
+        }
+        // 暂停
+        document.getElementById('pause').onclick = () => {
+            clearInterval(timer);
+            timer = null;
+        }
+        // 重置
+        document.getElementById('reset').onclick = () => {
+            clearInterval(timer);
+            timer = null;
+            sec = 0;
+            timerDom.innerText = "00:00:00";
+        }
+
+        // 代办清单逻辑
+        function addTask() {
+            const val = document.getElementById('taskInput').value.trim();
+            if (!val) return;
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span>${val}</span>
+                <button class="del" onclick="this.parentElement.remove()">删除</button>
+            `;
+            document.getElementById('taskList').appendChild(li);
+            document.getElementById('taskInput').value = '';
+        }
+        // 回车添加
+        document.getElementById('taskInput').onkeydown = e => {
+            if (e.key === 'Enter') addTask();
+        }
+    </script>
+</body>
+</html>
